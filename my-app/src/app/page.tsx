@@ -18,11 +18,11 @@ const bounceAnimation = `
 }
 `
 
-const features = [
-  { title: "Customized Diets", description: "Tailored meal plans for PCOS nutrition needs." },
-  { title: "Fitness Plans", description: "Personalized routines for your health goals." },
-  { title: "Symptom Tracker", description: "Monitor and analyze your PCOS symptoms." },
-];
+//const features = [
+//{ title: "Customized Diets", description: "Tailored meal plans for PCOS nutrition needs." },
+//{ title: "Fitness Plans", description: "Personalized routines for your health goals." },
+//{ title: "Symptom Tracker", description: "Monitor and analyze your PCOS symptoms." },
+//];
 
 const words = ["Nurture", "Balance", "Growth"]
 
