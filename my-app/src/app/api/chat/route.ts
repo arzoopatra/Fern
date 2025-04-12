@@ -2,7 +2,7 @@ import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
 
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || "",
+  apiKey: process.env.OPENAI_API_KEY!,
 });
 
 const getSystemMessage = (
@@ -96,12 +96,13 @@ export async function POST(req: Request) {
 
     const content = completion.choices[0].message.content;
 
-    if (!content || typeof content !== "string") {
-      throw new Error("OpenAI returned empty or invalid content.");
+    if (!content) {
+    throw new Error("No content received from OpenAI.");
     }
 
     return NextResponse.json(JSON.parse(content));
-  } catch (error) {
+
+    } catch (error) {
     console.error("Error in chat API:", error);
     return NextResponse.json(
       { error: "Failed to process chat request" },
