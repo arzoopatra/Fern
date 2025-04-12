@@ -2,9 +2,10 @@ import { OpenAI } from 'openai';
 import { NextResponse } from 'next/server';
 
 const openai = new OpenAI({
-  apiKey: ""
+  apiKey: process.env.OPENAI_API_KEY!, // Ensure your API key is set in environment variables
 });
 
+// System message generator for meal plan
 const getSystemMessage = (
   dietaryRestrictions: string, 
   calorieGoal: string, 
@@ -57,26 +58,40 @@ Remember: Output ONLY valid JSON with no extra text.`;
 
 export async function POST(req: Request) {
   try {
+    // Extract data from the incoming request
     const { messages, dietaryRestrictions, calorieGoal, cuisinePreferences, height, weight, age, goal } = await req.json();
     
+    // Construct the system message to send to OpenAI
     const systemMessage = {
       role: "system",
-      content: getSystemMessage(dietaryRestrictions, calorieGoal, cuisinePreferences, height, weight, age, goal)
+      content: getSystemMessage(dietaryRestrictions, calorieGoal, cuisinePreferences, height, weight, age, goal),
     };
 
+    // Add user messages to the system message
     const enhancedMessages = [systemMessage, ...messages];
 
+    // Call OpenAI API to get meal plan completion
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
       messages: enhancedMessages,
     });
 
-    // Return the JSON response directly.
-    return NextResponse.json(JSON.parse(completion.choices[0].message.content));
+    // Ensure the response content is not null
+    const content = completion.choices[0].message.content;
+
+    if (!content) {
+      throw new Error("No content received from OpenAI.");
+    }
+
+    // Return the JSON response directly
+    return NextResponse.json(JSON.parse(content));
+
   } catch (error) {
-    console.error('Error in chat API:', error);
+    console.error("Error in meal API:", error);
+
+    // Return an error response if something goes wrong
     return NextResponse.json(
-      { error: 'Failed to process chat request' },
+      { error: "Failed to process meal request" },
       { status: 500 }
     );
   }
