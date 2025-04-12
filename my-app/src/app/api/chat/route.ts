@@ -2,13 +2,13 @@ import { OpenAI } from "openai";
 import { NextResponse } from "next/server";
 
 const openai = new OpenAI({
-  apiKey: ""
+  apiKey: process.env.OPENAI_API_KEY || "",
 });
 
 const getSystemMessage = (
   daysPerWeek: string,
   timePerDay: string,
-  exersizeConstraints: string,
+  exerciseConstraints: string,
   height: string,
   weight: string,
   age: string,
@@ -23,7 +23,7 @@ const getSystemMessage = (
 - Goal: ${goal} (Gain Weight / Lose Weight)
 - Workout Frequency: ${daysPerWeek} days per week
 - Workout Duration: ${timePerDay} minutes per session
-- Available Equipment: ${exersizeConstraints}
+- Available Equipment: ${exerciseConstraints}
 
 ### REQUIREMENTS:
 1. The workout schedule MUST include exactly ${daysPerWeek} days.
@@ -63,11 +63,28 @@ Ensure that the workout details and recovery recommendations are tailored to som
 
 export async function POST(req: Request) {
   try {
-    const { messages, daysPerWeek, timePerDay, exersizeConstraints, height, weight, age, goal } = await req.json();
+    const {
+      messages,
+      daysPerWeek,
+      timePerDay,
+      exersizeConstraints,
+      height,
+      weight,
+      age,
+      goal
+    } = await req.json();
 
     const systemMessage = {
       role: "system",
-      content: getSystemMessage(daysPerWeek, timePerDay, exersizeConstraints, height, weight, age, goal),
+      content: getSystemMessage(
+        daysPerWeek,
+        timePerDay,
+        exersizeConstraints,
+        height,
+        weight,
+        age,
+        goal
+      ),
     };
 
     const enhancedMessages = [systemMessage, ...messages];
@@ -77,8 +94,13 @@ export async function POST(req: Request) {
       messages: enhancedMessages,
     });
 
-    // Parse and return the valid JSON output from the assistant.
-    return NextResponse.json(JSON.parse(completion.choices[0].message.content));
+    const content = completion.choices[0].message.content;
+
+    if (!content || typeof content !== "string") {
+      throw new Error("OpenAI returned empty or invalid content.");
+    }
+
+    return NextResponse.json(JSON.parse(content));
   } catch (error) {
     console.error("Error in chat API:", error);
     return NextResponse.json(
