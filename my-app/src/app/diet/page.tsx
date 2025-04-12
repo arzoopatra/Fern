@@ -9,7 +9,20 @@ import type React from "react";
 
 export default function Diet() {
   // Meal plan state stores a JSON object with keys as cuisines and values as arrays of meal recipes.
-  const [mealPlan, setMealPlan] = useState<Record<string, string[]>>({});
+  type Meal = {
+    mealName: string;
+    ingredients: string;
+    totalCalories: number;
+    caloriesPerServing: number;
+    macros: {
+      protein: string;
+      carbs: string;
+      fats: string;
+    };
+    note: string;
+  };
+  
+  const [mealPlan, setMealPlan] = useState<Record<string, Meal[]>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [dietaryRestrictions, setDietaryRestrictions] = useState("");
   const [calorieGoal, setCalorieGoal] = useState("");

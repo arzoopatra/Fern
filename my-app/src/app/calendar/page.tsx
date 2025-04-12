@@ -181,9 +181,9 @@ export default function Dashboard() {
       .sort((a, b) => a.day - b.day)
       .forEach((day) => {
         const dayHeader = `Day ${day.day}:`
-        pdf.setFont("Helvetica", "bold")
+        pdf.setFont("undefined", "bold")
         pdf.text(dayHeader, 20, yOffset)
-        pdf.setFont("Helvetica", "normal")
+        pdf.setFont("undefined", "normal")
         yOffset += 10
 
         if (day.isPeriod) {
